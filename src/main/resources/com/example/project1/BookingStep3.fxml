@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: white;"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.project1.controller.BookingStep3Controller">
+    <children>
+        <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <Label text="Choose Your Rooms as required" textFill="#1E3A8A">
+                    <font>
+                        <Font name="System Bold" size="28.0" /> </font>
+                </Label>
+                <Label fx:id="suggestionLabel" text="Based on your guest count, here are our recommendations. Please select your preferred rooms and quantity." textFill="#4B5563">
+                    <font>
+                        <Font size="13.0" /> </font>
+                    <VBox.margin>
+                        <Insets bottom="5.0" />
+                    </VBox.margin>
+                </Label>
+                <Label fx:id="datesDisplayLabel" text="Check-in: [Date] | Check-out: [Date]" textFill="#4B5563">
+                    <font>
+                        <Font size="13.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="10.0" />
+                    </VBox.margin>
+                </Label>
+                <VBox fx:id="roomListContainer" spacing="8.0" style="-fx-background-color: white;" VBox.vgrow="ALWAYS"> <padding>
+                    <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" /> </padding>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D1D5DB; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10;"> <VBox HBox.hgrow="ALWAYS">
+                        <Label text="Single Room" textFill="#1E3A8A">
+                            <font>
+                                <Font name="System Bold" size="16.0" /> </font>
+                        </Label>
+                        <Label text="Equipped with a Queen Bed. Max 2 Adults." textFill="#4B5563">
+                            <font>
+                                <Font size="12.0" /> </font>
+                        </Label>
+                        <Label text="Price: $100/night" textFill="#10B981">
+                            <font>
+                                <Font name="System Bold" size="13.0" /> </font>
+                        </Label>
+                    </VBox>
+                        <VBox alignment="CENTER_RIGHT" spacing="3.0"> <Label text="Quantity:" textFill="#4B5563">
+                            <font>
+                                <Font size="12.0" /> </font>
+                        </Label>
+                            <TextField fx:id="singleRoomQuantityField" alignment="CENTER" prefWidth="40.0" promptText="e.g. 1">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </TextField>
+                            <CheckBox fx:id="singleRoomCheckBox" text="Select">
+                                <font>
+                                    <Font size="12.0" /> </font>
+                            </CheckBox>
+                        </VBox>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D1D5DB; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10;">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Double Room" textFill="#1E3A8A">
+                                <font>
+                                    <Font name="System Bold" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label text="Spacious with two Queen Beds. Max 4 Adults." textFill="#4B5563">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                            <Label text="Price: $180/night" textFill="#10B981">
+                                <font>
+                                    <Font name="System Bold" size="13.0" />
+                                </font>
+                            </Label>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                            <Label text="Quantity:" textFill="#4B5563">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="doubleRoomQuantityField" alignment="CENTER" prefWidth="40.0" promptText="e.g. 1">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </TextField>
+                            <CheckBox fx:id="doubleRoomCheckBox" text="Select">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </CheckBox>
+                        </VBox>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D1D5DB; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10;">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Deluxe Room" textFill="#1E3A8A">
+                                <font>
+                                    <Font name="System Bold" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label text="Premium amenities. King Bed. Max 2 Adults." textFill="#4B5563">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                            <Label text="Price: $250/night" textFill="#10B981">
+                                <font>
+                                    <Font name="System Bold" size="13.0" />
+                                </font>
+                            </Label>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                            <Label text="Quantity:" textFill="#4B5563">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="deluxeRoomQuantityField" alignment="CENTER" prefWidth="40.0" promptText="e.g. 1">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </TextField>
+                            <CheckBox fx:id="deluxeRoomCheckBox" text="Select">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </CheckBox>
+                        </VBox>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D1D5DB; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10;">
+                        <VBox HBox.hgrow="ALWAYS">
+                            <Label text="Penthouse" textFill="#1E3A8A">
+                                <font>
+                                    <Font name="System Bold" size="16.0" />
+                                </font>
+                            </Label>
+                            <Label text="Luxurious suite with stunning views. Max 2 Adults." textFill="#4B5563">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                            <Label text="Price: $500/night" textFill="#10B981">
+                                <font>
+                                    <Font name="System Bold" size="13.0" />
+                                </font>
+                            </Label>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" spacing="3.0">
+                            <Label text="Quantity:" textFill="#4B5563">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </Label>
+                            <TextField fx:id="penthouseQuantityField" alignment="CENTER" prefWidth="40.0" promptText="e.g. 1">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </TextField>
+                            <CheckBox fx:id="penthouseCheckBox" text="Select">
+                                <font>
+                                    <Font size="12.0" />
+                                </font>
+                            </CheckBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+                <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="20.0">
+                    <children>
+                        <Button fx:id="backButton" onAction="#handleBack" style="-fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5;" text="Back to Dates" />
+                        <Button fx:id="rulesButton" onAction="#handleRulesAndRegulations" style="-fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5;" text="Rules and Regulations" />
+                        <Button fx:id="nextButton" onAction="#handleNext" style="-fx-text-fill: black; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5;" text="Next: Guest Details" />
+                    </children>
+                    <padding>
+                        <Insets left="10.0" right="10.0" />
+                    </padding>
+                </HBox>
+            </children>
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+        </VBox>
+    </children>
+</AnchorPane>

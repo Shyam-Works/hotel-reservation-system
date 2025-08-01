@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="650.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project1.controller.GuestDetailsController">
+    <children>
+        <VBox alignment="TOP_CENTER" layoutX="50.0" layoutY="30.0" prefHeight="590.0" prefWidth="500.0" spacing="10.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #B0C4DE; -fx-border-radius: 10; -fx-padding: 20;" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="30.0">
+            <children>
+                <Label text="Guest &amp; Reservation Details">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="10.0" />
+                    </VBox.margin>
+                </Label>
+
+                <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Guest Information" />
+                <GridPane hgap="10" vgap="8">
+                    <padding>
+                        <Insets bottom="10" left="20" right="20" top="5" />
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <Label text="First Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label fx:id="firstNameLabel" text="[First Name]" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Last Name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label fx:id="lastNameLabel" text="[Last Name]" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Gender:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label fx:id="genderLabel" text="[Gender]" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <Label text="Phone Number:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <Label fx:id="phoneLabel" text="[Phone Number]" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <Label fx:id="emailLabel" text="[Email Address]" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                    <Label text="Age:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                    <Label fx:id="ageLabel" text="[Age]" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                    <Label text="Street Name:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                    <Label fx:id="streetNameLabel" text="[Street Name]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+                    <Label text="Apartment/Suite:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                    <Label fx:id="aptSuiteLabel" text="[Apartment/Suite]" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+                    <Label text="City:" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                    <Label fx:id="cityLabel" text="[City]" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+
+                    <Label text="Province/State:" GridPane.columnIndex="0" GridPane.rowIndex="9" />
+                    <Label fx:id="provinceStateLabel" text="[Province/State]" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+
+                    <Label text="Country:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+                    <Label fx:id="countryLabel" text="[Country]" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                </GridPane>
+
+                <Separator prefWidth="200.0" />
+
+                <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Reservation Information" />
+                <GridPane hgap="10" vgap="8">
+                    <padding>
+                        <Insets bottom="10" left="20" right="20" top="5" />
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <Label text="Reservation ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label fx:id="reservationIdLabel" text="[Reservation ID]" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Check-in Date:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label fx:id="checkInDateLabel" text="[Check-in Date]" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                    <Label text="Check-out Date:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                    <Label fx:id="checkOutDateLabel" text="[Check-out Date]" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                    <Label text="Number of Guests:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                    <Label fx:id="numGuestsLabel" text="[Number]" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                    <Label text="Status:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                    <Label fx:id="statusLabel" text="[Status]" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                </GridPane>
+
+                <Separator prefWidth="200.0" />
+
+                <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Assigned Room Information" />
+                <GridPane hgap="10" vgap="8">
+                    <padding>
+                        <Insets bottom="10" left="20" right="20" top="5" />
+                    </padding>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="120.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                    <Label text="Room Number:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                    <Label fx:id="roomNumberLabel" text="[Room Number]" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                    <Label text="Room Type:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                    <Label fx:id="roomTypeLabel" text="[Room Type]" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                </GridPane>
+
+                <VBox VBox.vgrow="ALWAYS" />
+                <HBox alignment="CENTER">
+                    <children>
+                        <Button fx:id="backButton" onAction="#handleBack" prefWidth="150.0" text="Back to Search">
+                            <HBox.margin>
+                                <Insets top="15.0" />
+                            </HBox.margin>
+                        </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
