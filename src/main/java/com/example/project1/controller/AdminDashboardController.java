@@ -1,7 +1,8 @@
 package com.example.project1.controller;
 
 import com.example.project1.dao.BookingDao; // To fetch booking data
-import com.example.project1.model.ReservationDisplayData; // To populate the table
+import com.example.project1.model.ReservationDisplayData;
+import javafx.scene.Parent;
 import com.example.project1.util.AlertUtil; // For alerts
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -59,13 +60,27 @@ public class AdminDashboardController {
         }
     }
 
-    // --- Button Action Handlers (Stubs for now) ---
-
     @FXML
     private void handleNewReservation(ActionEvent event) {
-        AlertUtil.showInformationAlert("Functionality", "New Reservation functionality coming soon!");
-        LOGGER.log(Level.INFO, "New Reservation button clicked.");
-        // Implement navigation to a new booking flow for admin
+        LOGGER.log(Level.INFO, "New Reservation button clicked. Navigating to BookingStep1.fxml");
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            URL fxmlLocation = getClass().getResource("/com/example/project1/BookingStep1.fxml");
+            if (fxmlLocation == null) {
+                AlertUtil.showErrorAlert("Navigation Error", "BookingStep1.fxml not found! Check the path.");
+                LOGGER.log(Level.SEVERE, "BookingStep1.fxml not found for new reservation navigation.");
+                return;
+            }
+            FXMLLoader fxmlLoader = new FXMLLoader(fxmlLocation);
+            Scene scene = new Scene(fxmlLoader.load());
+
+            stage.setScene(scene);
+            stage.setTitle("Hotel ABC - New Reservation (Step 1)");
+            stage.show();
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Could not load BookingStep1 page for new reservation.", e);
+            AlertUtil.showErrorAlert("Navigation Error", "Could not load new reservation page: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -97,16 +112,56 @@ public class AdminDashboardController {
 
     @FXML
     private void handleCheckOut(ActionEvent event) {
-        AlertUtil.showInformationAlert("Functionality", "Check-Out functionality coming soon!");
-        LOGGER.log(Level.INFO, "Check-Out button clicked.");
-        // Implement logic for checking out guests
+        ReservationDisplayData selectedBooking = reservationsTable.getSelectionModel().getSelectedItem();
+
+        if (selectedBooking == null) {
+            AlertUtil.showWarningAlert("No Selection", "Please select a reservation from the table to check out.");
+            return;
+        }
+
+        // We assume ReservationDisplayData has a getReservationId() method (which it should)
+        String reservationId = selectedBooking.getReservationId();
+        String guestName = selectedBooking.getGuestName();
+
+        // Confirmation dialog
+        boolean confirm = AlertUtil.showConfirmationAlert("Confirm Check-Out",
+                "Are you sure you want to check out " + guestName +
+                        " (Reservation ID: " + reservationId + ")?\nThis will mark the booking as 'Checked Out' in the system.");
+
+        if (confirm) {
+            // Call the DAO to update the booking status to "Checked Out"
+            boolean success = bookingDao.updateBookingStatus(reservationId, "Checked Out");
+
+            if (success) {
+                AlertUtil.showInformationAlert("Check-Out Successful",
+                        "Booking for " + guestName + " (Reservation ID: " + reservationId + ") has been successfully checked out.");
+                LOGGER.log(Level.INFO, "Booking for Reservation ID: {0} successfully checked out.", reservationId);
+                loadCurrentReservations(); // Refresh the table to reflect the updated status
+            } else {
+                AlertUtil.showErrorAlert("Check-Out Failed",
+                        "Failed to check out booking for " + guestName + " (Reservation ID: " + reservationId + "). Please try again.");
+                LOGGER.log(Level.SEVERE, "Failed to check out booking for Reservation ID: {0}.", reservationId);
+            }
+        }
     }
 
     @FXML
     private void handleReports(ActionEvent event) {
-        AlertUtil.showInformationAlert("Functionality", "Reports functionality coming soon!");
-        LOGGER.log(Level.INFO, "Reports button clicked.");
-        // Implement navigation to a reports page
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/project1/AdminReports.fxml"));
+            Parent reportsParent = loader.load();
+            Scene reportsScene = new Scene(reportsParent);
+
+            // Get the current stage (window) and set the new scene
+            Stage window = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            window.setScene(reportsScene);
+            window.setTitle("Billing & Reports"); // Set the title for the new window
+            window.show();
+            LOGGER.log(Level.INFO, "Navigated to Billing & Reports screen.");
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error navigating to Billing & Reports screen.", e);
+            AlertUtil.showErrorAlert("Navigation Error", "Could not load the Billing & Reports screen.");
+        }
     }
 
     // --- Admin Logout ---

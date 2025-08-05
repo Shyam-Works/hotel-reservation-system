@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import javafx.scene.control.*;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -127,6 +129,26 @@ public class BookingStep1Controller {
             LOGGER.log(Level.SEVERE, "Could not load feedback page.", e);
             showAlert("Navigation Error", "Could not load feedback page: " + e.getMessage());
         }
+    }
+
+    @FXML private TextField guestNameField;
+    @FXML private TextField roomField;
+    @FXML private DatePicker checkInDatePicker;
+    @FXML private ChoiceBox<String> statusChoiceBox;
+
+    public void prefillForm(String guestName, String room, String checkInDate, String status) {
+        guestNameField.setText(guestName);
+        roomField.setText(room);
+
+        // Parse the check-in date string to LocalDate
+        try {
+            LocalDate date = LocalDate.parse(checkInDate); // Assuming format is "yyyy-MM-dd"
+            checkInDatePicker.setValue(date);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format: " + checkInDate);
+        }
+
+        statusChoiceBox.setValue(status);
     }
 
     private void showAlert(String title, String message) {

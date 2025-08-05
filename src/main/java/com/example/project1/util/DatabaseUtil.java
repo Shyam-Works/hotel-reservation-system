@@ -1,6 +1,7 @@
 package com.example.project1.util;
 
 import java.sql.Connection;
+import com.example.project1.config.DatabaseConfig;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -9,14 +10,13 @@ import java.util.logging.Logger;
 public class DatabaseUtil {
 
     private static final Logger LOGGER = Logger.getLogger(DatabaseUtil.class.getName());
-    private static final String DATABASE_URL = "jdbc:sqlite:hotel_reservation.db"; // This will create/connect to hotel_reservation.db in your project root
+    private static final String DATABASE_URL = "jdbc:sqlite:hotel_reservation.db";
 
     public static Connection getConnection() {
         Connection connection = null;
         try {
-            // Load the SQLite JDBC driver (optional for modern JDKs, but good practice)
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(DATABASE_URL);
+            connection = DriverManager.getConnection(DatabaseConfig.DB_URL);
             LOGGER.log(Level.INFO, "Database connection established.");
         } catch (ClassNotFoundException e) {
             LOGGER.log(Level.SEVERE, "SQLite JDBC driver not found.", e);
@@ -37,12 +37,11 @@ public class DatabaseUtil {
         }
     }
 
-    // You might want a method to initialize your database schema
     public static void initializeDatabase() {
         try (Connection conn = getConnection();
              var stmt = conn.createStatement()) {
 
-            // Create Guest table
+            // Create Guest table (if you still use this for separate guest data)
             String createGuestTable = "CREATE TABLE IF NOT EXISTS Guests (" +
                     "guestId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "firstName TEXT NOT NULL," +
@@ -53,7 +52,7 @@ public class DatabaseUtil {
             stmt.execute(createGuestTable);
             LOGGER.log(Level.INFO, "Guests table ensured.");
 
-            // Create Rooms table
+            // Create Rooms table (if you still use this for separate room data)
             String createRoomTable = "CREATE TABLE IF NOT EXISTS Rooms (" +
                     "roomId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "roomNumber TEXT UNIQUE NOT NULL," +
@@ -64,20 +63,30 @@ public class DatabaseUtil {
             stmt.execute(createRoomTable);
             LOGGER.log(Level.INFO, "Rooms table ensured.");
 
-            // Create Reservations table
-            String createReservationTable = "CREATE TABLE IF NOT EXISTS Reservations (" +
-                    "reservationId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "guestId INTEGER NOT NULL," +
-                    "roomId INTEGER NOT NULL," +
-                    "checkInDate TEXT NOT NULL," + // YYYY-MM-DD format
-                    "checkOutDate TEXT NOT NULL," + // YYYY-MM-DD format
-                    "totalAmount REAL NOT NULL," +
-                    "status TEXT NOT NULL," + // e.g., CONFIRMED, CHECKED_IN, CHECKED_OUT, CANCELLED
-                    "FOREIGN KEY (guestId) REFERENCES Guests(guestId)," +
-                    "FOREIGN KEY (roomId) REFERENCES Rooms(roomId)" +
+            // --- IMPORTANT CHANGE HERE: Create 'bookings' table ---
+            String createBookingsTable = "CREATE TABLE IF NOT EXISTS bookings (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "reservation_id TEXT UNIQUE NOT NULL," +
+                    "number_of_guests INTEGER NOT NULL," +
+                    "check_in_date TEXT NOT NULL," +
+                    "check_out_date TEXT NOT NULL," +
+                    "total_price REAL NOT NULL," +
+                    "selected_rooms_summary TEXT," + // e.g., "Standard x 1; Deluxe x 1"
+                    "guest_first_name TEXT NOT NULL," +
+                    "guest_last_name TEXT NOT NULL," +
+                    "guest_gender TEXT," +
+                    "guest_phone TEXT NOT NULL," +
+                    "guest_email TEXT NOT NULL," +
+                    "guest_age INTEGER," +
+                    "guest_street TEXT," +
+                    "guest_apt_suite TEXT," +
+                    "guest_city TEXT," +
+                    "guest_province_state TEXT," +
+                    "guest_country TEXT," +
+                    "status TEXT DEFAULT 'Confirmed' " + // Added status column
                     ");";
-            stmt.execute(createReservationTable);
-            LOGGER.log(Level.INFO, "Reservations table ensured.");
+            stmt.execute(createBookingsTable);
+            LOGGER.log(Level.INFO, "bookings table ensured."); // Log for 'bookings'
 
             // Create Admin table (for login)
             String createAdminTable = "CREATE TABLE IF NOT EXISTS Admins (" +
@@ -88,7 +97,7 @@ public class DatabaseUtil {
             stmt.execute(createAdminTable);
             LOGGER.log(Level.INFO, "Admins table ensured.");
 
-            // You might want to add a default admin if the table is empty
+            // Add a default admin if the table is empty
             var rs = conn.createStatement().executeQuery("SELECT COUNT(*) FROM Admins;");
             if (rs.next() && rs.getInt(1) == 0) {
                 // For demonstration, using a plain password. In production, ALWAYS hash passwords.

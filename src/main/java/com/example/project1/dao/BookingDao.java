@@ -4,49 +4,43 @@ import com.example.project1.config.DatabaseConfig;
 import com.example.project1.model.BookingSession;
 import com.example.project1.model.ReservationDisplayData;
 import com.example.project1.model.GuestSearchResult;
+import com.example.project1.model.Room;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.example.project1.model.BookingSession;
+import java.util.stream.Collectors;
+
 public class BookingDao {
 
     private static final Logger LOGGER = Logger.getLogger(BookingDao.class.getName());
-    // Formatter for storing dates as TEXT in the database
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    private RoomDao roomDao;
+
     public BookingDao() {
-        // When an instance of BookingDao is created, ensure the table exists
+        this.roomDao = new RoomDao();
         createBookingsTable();
     }
 
-    /**
-     * Establishes a connection to the SQLite database.
-     * @return A Connection object.
-     * @throws SQLException If a database access error occurs.
-     */
     private Connection connect() throws SQLException {
         return DriverManager.getConnection(DatabaseConfig.DB_URL);
     }
 
-    /**
-     * Creates the 'bookings' table in the database if it does not already exist.
-     * This method is called automatically when a BookingDao object is instantiated.
-     */
     public void createBookingsTable() {
-        // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS bookings (\n"
+        String sqlBookings = "CREATE TABLE IF NOT EXISTS bookings (\n"
                 + " id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                 + " reservation_id TEXT NOT NULL UNIQUE,\n"
                 + " number_of_guests INTEGER NOT NULL,\n"
                 + " check_in_date TEXT NOT NULL,\n"
                 + " check_out_date TEXT NOT NULL,\n"
                 + " total_price REAL NOT NULL,\n"
-                + " selected_rooms_summary TEXT,\n" // Summary of rooms, e.g., "Standard x 1; Deluxe x 2"
                 + " guest_first_name TEXT NOT NULL,\n"
                 + " guest_last_name TEXT NOT NULL,\n"
                 + " guest_gender TEXT,\n"
@@ -57,155 +51,162 @@ public class BookingDao {
                 + " guest_apt_suite TEXT,\n"
                 + " guest_city TEXT NOT NULL,\n"
                 + " guest_province_state TEXT NOT NULL,\n"
-                + " guest_country TEXT NOT NULL\n"
+                + " guest_country TEXT NOT NULL,\n"
+                + " status TEXT DEFAULT 'Confirmed',\n"
+                + " discount_amount REAL DEFAULT 0.0"
+                + ");";
+
+        String sqlRooms = "CREATE TABLE IF NOT EXISTS rooms (\n"
+                + " room_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                + " room_number TEXT NOT NULL UNIQUE,\n"
+                + " room_type TEXT NOT NULL,\n"
+                + " price_per_night REAL NOT NULL\n"
+                + ");";
+
+        String sqlBookingsRooms = "CREATE TABLE IF NOT EXISTS bookings_rooms (\n"
+                + " booking_room_id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                + " booking_id INTEGER NOT NULL,\n"
+                + " room_id INTEGER NOT NULL,\n"
+                + " FOREIGN KEY (booking_id) REFERENCES bookings(id) ON DELETE CASCADE,\n"
+                + " FOREIGN KEY (room_id) REFERENCES rooms(room_id)\n"
                 + ");";
 
         try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.execute(); // Execute the SQL statement
-            LOGGER.log(Level.INFO, "Bookings table created or already exists.");
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sqlBookings);
+            stmt.execute(sqlRooms);
+            stmt.execute(sqlBookingsRooms);
+            LOGGER.log(Level.INFO, "Tables created or already exist.");
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error creating bookings table: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Error creating tables: " + e.getMessage(), e);
         }
     }
 
 
+    public int insertBooking(BookingSession session) {
+        String sql = "INSERT INTO bookings(" +
+                "reservation_id, number_of_guests, check_in_date, check_out_date, " +
+                "total_price, guest_first_name, guest_last_name, " +
+                "guest_gender, guest_phone, guest_email, guest_age, guest_street, " +
+                "guest_apt_suite, guest_city, guest_province_state, guest_country, status, discount_amount) " +
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    /**
-     * Inserts a new booking record into the 'bookings' table.
-     * @param session The BookingSession object containing all the details of the booking.
-     * @return true if the booking was successfully inserted, false otherwise.
-     */
-    public boolean insertBooking(BookingSession session) {
-        String sql = "INSERT INTO bookings("
-                + "reservation_id, number_of_guests, check_in_date, check_out_date, total_price, "
-                + "selected_rooms_summary, guest_first_name, guest_last_name, guest_gender, "
-                + "guest_phone, guest_email, guest_age, guest_street, guest_apt_suite, "
-                + "guest_city, guest_province_state, guest_country) "
-                + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-
+        int bookingId = -1;
         try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            // Convert the map of selected rooms to a readable string for storage
-            String roomsSummary = "";
-            if (session.getSelectedRoomsAndQuantities() != null && !session.getSelectedRoomsAndQuantities().isEmpty()) {
-                StringBuilder sb = new StringBuilder();
-                for (Map.Entry<String, Integer> entry : session.getSelectedRoomsAndQuantities().entrySet()) {
-                    if (sb.length() > 0) sb.append("; "); // Use a semicolon as a separator
-                    sb.append(entry.getKey()).append(" x ").append(entry.getValue());
-                }
-                roomsSummary = sb.toString();
-            }
-
-            // Set the parameters for the prepared statement
             pstmt.setString(1, session.getReservationId());
             pstmt.setInt(2, session.getNumberOfGuests());
-            pstmt.setString(3, session.getCheckInDate().format(DATE_FORMATTER)); // Format date to string
-            pstmt.setString(4, session.getCheckOutDate().format(DATE_FORMATTER)); // Format date to string
+            pstmt.setString(3, session.getCheckInDate().format(DATE_FORMATTER));
+            pstmt.setString(4, session.getCheckOutDate().format(DATE_FORMATTER));
             pstmt.setDouble(5, session.getTotalPrice());
-            pstmt.setString(6, roomsSummary); // Store the rooms summary string
-            pstmt.setString(7, session.getGuestFirstName());
-            pstmt.setString(8, session.getGuestLastName());
-            pstmt.setString(9, session.getGuestGender());
-            pstmt.setString(10, session.getGuestPhone());
-            pstmt.setString(11, session.getGuestEmail());
-            pstmt.setInt(12, session.getGuestAge());
-            pstmt.setString(13, session.getGuestStreet());
-            pstmt.setString(14, session.getGuestAptSuite());
-            pstmt.setString(15, session.getGuestCity());
-            pstmt.setString(16, session.getGuestProvinceState()); // Note: using getProvinceState
-            pstmt.setString(17, session.getGuestCountry());
+            pstmt.setString(6, session.getGuestFirstName());
+            pstmt.setString(7, session.getGuestLastName());
+            pstmt.setString(8, session.getGuestGender());
+            pstmt.setString(9, session.getGuestPhone());
+            pstmt.setString(10, session.getGuestEmail());
+            pstmt.setInt(11, session.getGuestAge());
+            pstmt.setString(12, session.getGuestStreet());
+            pstmt.setString(13, session.getGuestAptSuite());
+            pstmt.setString(14, session.getGuestCity());
+            pstmt.setString(15, session.getGuestProvinceState());
+            pstmt.setString(16, session.getGuestCountry());
+            pstmt.setString(17, session.getStatus() != null ? session.getStatus() : "Confirmed");
+            pstmt.setDouble(18, session.getDiscountAmount());
 
-            pstmt.executeUpdate(); // Execute the insert statement
-            LOGGER.log(Level.INFO, "Booking with ID {0} saved to database successfully.", session.getReservationId());
-            return true;
-        } catch (SQLException e) {
-            // Log specific error for unique constraint violation
-            if (e.getMessage() != null && e.getMessage().contains("UNIQUE constraint failed: bookings.reservation_id")) {
-                LOGGER.log(Level.WARNING, "Attempted to save booking with a duplicate reservation ID: {0}. This booking may have already been saved.", session.getReservationId());
-            } else {
-                LOGGER.log(Level.SEVERE, "Error inserting booking into database: " + e.getMessage(), e);
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        bookingId = generatedKeys.getInt(1);
+                        // NEW: Assign rooms to the booking using the new DAO
+                        if (session.getAssignedRooms() != null && !session.getAssignedRooms().isEmpty()) {
+                            List<Integer> roomIds = session.getAssignedRooms().stream()
+                                    .map(Room::getRoomId)
+                                    .collect(Collectors.toList());
+                            roomDao.assignRoomsToBooking(bookingId, roomIds);
+                        }
+                    }
+                }
+                LOGGER.log(Level.INFO, "Booking with ID {0} saved to database successfully.", session.getReservationId());
             }
+            return bookingId;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error inserting booking into database: " + e.getMessage(), e);
+            return -1;
+        }
+    }
+
+    public boolean updateBookingStatus(String reservationId, String newStatus) {
+        String sql = "UPDATE bookings SET status = ? WHERE reservation_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newStatus);
+            pstmt.setString(2, reservationId);
+            int rowsAffected = pstmt.executeUpdate();
+            if (rowsAffected > 0) {
+                LOGGER.log(Level.INFO, "Booking status for Reservation ID {0} updated to {1}.", new Object[]{reservationId, newStatus});
+                return true;
+            } else {
+                LOGGER.log(Level.WARNING, "No booking found with Reservation ID {0} for status update.", reservationId);
+                return false;
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error updating booking status for Reservation ID {0}: {1}", new Object[]{reservationId, e.getMessage()});
             return false;
         }
     }
 
-
-
-    /**
-     * Retrieves a list of booking records, primarily for display on the admin dashboard.
-     * Can be extended to filter by date, status, etc.
-     * For "Current Reservations (Next 24 Hours)", we'll fetch all and filter in controller or add a WHERE clause.
-     * For simplicity, let's fetch recent and upcoming bookings.
-     * @return A list of ReservationDisplayData objects.
-     */
     public List<ReservationDisplayData> getRecentAndUpcomingBookings() {
-        List<ReservationDisplayData> reservations = new ArrayList<>();
-        // SQL to select relevant data from the bookings table
-        // We'll order by check-in date to show upcoming first
-        String sql = "SELECT guest_first_name, guest_last_name, selected_rooms_summary, check_in_date, check_out_date " +
-                "FROM bookings " +
-                "ORDER BY check_in_date ASC";
+        List<ReservationDisplayData> bookings = new ArrayList<>();
+        String sql = "SELECT b.reservation_id, b.guest_first_name, b.guest_last_name, b.check_in_date, b.status, " +
+                "GROUP_CONCAT(r.room_type, '; ') AS rooms_summary " +
+                "FROM bookings b " +
+                "LEFT JOIN bookings_rooms br ON b.id = br.booking_id " +
+                "LEFT JOIN rooms r ON br.room_id = r.room_id " +
+                "WHERE b.check_out_date >= CURRENT_DATE AND b.status NOT IN ('Checked Out', 'Cancelled') " +
+                "GROUP BY b.id " +
+                "ORDER BY b.check_in_date ASC, b.guest_last_name ASC";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
-            LocalDate today = LocalDate.now();
-
             while (rs.next()) {
-                String guestFirstName = rs.getString("guest_first_name");
-                String guestLastName = rs.getString("guest_last_name");
-                String fullName = guestFirstName + " " + guestLastName;
-
-                String roomSummary = rs.getString("selected_rooms_summary");
-                // Take first room type if multiple, or just the whole summary
-                String primaryRoom = "N/A";
-                if (roomSummary != null && !roomSummary.isEmpty()) {
-                    primaryRoom = roomSummary.split(";")[0].trim(); // Takes the first room type listed
-                    // Optional: You might want to parse this better if 'Room' column needs specific data
-                }
-
+                String reservationId = rs.getString("reservation_id");
+                String guestName = rs.getString("guest_first_name") + " " + rs.getString("guest_last_name");
+                String roomsSummary = rs.getString("rooms_summary");
                 String checkInDateStr = rs.getString("check_in_date");
-                LocalDate checkInDate = LocalDate.parse(checkInDateStr, DATE_FORMATTER); // Parse string to LocalDate
+                LocalDate checkInDate = null;
+                if (checkInDateStr != null) {
+                    checkInDate = LocalDate.parse(checkInDateStr, DATE_FORMATTER);
+                }
+                String status = rs.getString("status");
 
-                String status;
-                if (checkInDate.isAfter(today)) {
-                    status = "Upcoming";
-                } else if (checkInDate.isEqual(today)) {
-                    status = "Today";
-                } else {
-                    status = "Past"; // Or "Checked Out" if you had a status field
+                String roomDisplay = "Multiple";
+                if (roomsSummary != null && !roomsSummary.isEmpty()) {
+                    String[] roomTypes = roomsSummary.split(";");
+                    roomDisplay = roomTypes[0].trim();
                 }
 
-                // Filter for "Next 24 Hours" or "Current"
-                // For "Next 24 Hours" from current time, you'd need check-in time in DB.
-                // For simplicity now, let's just include all recent/upcoming that haven't fully passed.
-                // A more precise "Next 24 Hours" would involve checking if check-in_date is today or tomorrow
-                // AND checking check-in_time if available.
-                // For now, let's include anything checked in today or future.
-                if (!checkInDate.isBefore(today)) { // Include today and future bookings
-                    reservations.add(new ReservationDisplayData(fullName, primaryRoom, checkInDateStr, status));
+                if (checkInDate != null) {
+                    bookings.add(new ReservationDisplayData(
+                            reservationId,
+                            guestName,
+                            roomDisplay,
+                            checkInDate,
+                            status
+                    ));
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching bookings for admin dashboard: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Error fetching recent and upcoming bookings: {0}", e.getMessage());
         }
-        return reservations;
+        return bookings;
     }
 
-
-
-
-    /**
-     * Searches for booking records by guest name (first or last) or phone number.
-     * @param searchTerm The search query (can be part of name or phone number).
-     * @return A list of GuestSearchResult objects matching the search term.
-     */
     public List<GuestSearchResult> searchBookings(String searchTerm) {
         List<GuestSearchResult> results = new ArrayList<>();
-        // Using LIKE for partial matches and || for concatenation in SQLite
         String sql = "SELECT guest_first_name, guest_last_name, guest_phone, reservation_id, check_in_date " +
                 "FROM bookings " +
                 "WHERE guest_first_name LIKE ? OR guest_last_name LIKE ? OR guest_phone LIKE ? " +
@@ -214,8 +215,7 @@ public class BookingDao {
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            String likeTerm = "%" + searchTerm.trim() + "%"; // Add wildcards for partial search
-
+            String likeTerm = "%" + searchTerm.trim() + "%";
             pstmt.setString(1, likeTerm);
             pstmt.setString(2, likeTerm);
             pstmt.setString(3, likeTerm);
@@ -227,7 +227,7 @@ public class BookingDao {
                     String fullName = guestFirstName + " " + guestLastName;
                     String phone = rs.getString("guest_phone");
                     String reservationId = rs.getString("reservation_id");
-                    String checkInDate = rs.getString("check_in_date"); // Stored as TEXT
+                    String checkInDate = rs.getString("check_in_date");
 
                     results.add(new GuestSearchResult(fullName, phone, reservationId, checkInDate));
                 }
@@ -237,8 +237,6 @@ public class BookingDao {
         }
         return results;
     }
-
-
 
     public BookingSession getBookingByReservationId(String reservationId) {
         String sql = "SELECT * FROM bookings WHERE reservation_id = ?";
@@ -257,7 +255,11 @@ public class BookingDao {
                     session.setCheckInDate(LocalDate.parse(rs.getString("check_in_date"), DATE_FORMATTER));
                     session.setCheckOutDate(LocalDate.parse(rs.getString("check_out_date"), DATE_FORMATTER));
                     session.setTotalPrice(rs.getDouble("total_price"));
-                    session.setSelectedRoomsSummary(rs.getString("selected_rooms_summary"));
+
+                    // NEW: Fetch assigned rooms from the database
+                    List<Room> assignedRooms = getAssignedRoomsForBooking(rs.getInt("id"));
+                    session.setAssignedRooms(assignedRooms);
+
                     session.setGuestFirstName(rs.getString("guest_first_name"));
                     session.setGuestLastName(rs.getString("guest_last_name"));
                     session.setGuestGender(rs.getString("guest_gender"));
@@ -269,15 +271,8 @@ public class BookingDao {
                     session.setGuestCity(rs.getString("guest_city"));
                     session.setGuestProvinceState(rs.getString("guest_province_state"));
                     session.setGuestCountry(rs.getString("guest_country"));
-
-                    // Assuming 'status' is not yet in your DB table 'bookings'.
-                    // If you add a status column, you can retrieve it here.
-                    // For now, let's default to "Confirmed" or derive based on date if needed
-                    session.setStatus("Confirmed"); // Placeholder status
-
-                    LOGGER.log(Level.INFO, "Fetched BookingSession for Reservation ID: {0}", reservationId);
-                } else {
-                    LOGGER.log(Level.WARNING, "No booking found for Reservation ID: {0}", reservationId);
+                    session.setStatus(rs.getString("status"));
+                    session.setDiscountAmount(rs.getDouble("discount_amount"));
                 }
             }
         } catch (SQLException e) {
@@ -286,14 +281,38 @@ public class BookingDao {
         return session;
     }
 
+    private List<Room> getAssignedRoomsForBooking(int bookingId) {
+        List<Room> rooms = new ArrayList<>();
+        String sql = "SELECT r.room_id, r.room_number, r.room_type, r.price_per_night " +
+                "FROM rooms r " +
+                "JOIN bookings_rooms br ON r.room_id = br.room_id " +
+                "WHERE br.booking_id = ?";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, bookingId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    rooms.add(new Room(
+                            rs.getInt("room_id"),
+                            rs.getString("room_number"),
+                            rs.getString("room_type"),
+                            rs.getDouble("price_per_night"),
+                            "Reserved"
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Error fetching assigned rooms for booking ID: " + bookingId, e);
+        }
+        return rooms;
+    }
+
     public boolean deleteBooking(String reservationId) {
         String sql = "DELETE FROM bookings WHERE reservation_id = ?";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setString(1, reservationId);
-            int rowsAffected = pstmt.executeUpdate(); // Execute the delete statement
-
+            int rowsAffected = pstmt.executeUpdate();
             if (rowsAffected > 0) {
                 LOGGER.log(Level.INFO, "Booking with Reservation ID {0} deleted successfully.", reservationId);
                 return true;
@@ -307,23 +326,15 @@ public class BookingDao {
         }
     }
 
-
-
-    /**
-     * Updates an existing booking record in the database.
-     * The booking is identified by its reservation_id.
-     * @param session The BookingSession object containing the updated booking details.
-     * @return true if the booking was successfully updated, false otherwise.
-     */
     public boolean updateBooking(BookingSession session) {
         String sql = "UPDATE bookings SET " +
                 "number_of_guests = ?, check_in_date = ?, check_out_date = ?, " +
-                "total_price = ?, selected_rooms_summary = ?, " +
-                "guest_first_name = ?, guest_last_name = ?, guest_gender = ?, " +
+                "total_price = ?, guest_first_name = ?, guest_last_name = ?, guest_gender = ?, " +
                 "guest_phone = ?, guest_email = ?, guest_age = ?, " +
                 "guest_street = ?, guest_apt_suite = ?, guest_city = ?, " +
-                "guest_province_state = ?, guest_country = ? " +
-                "WHERE reservation_id = ?"; // Identify record by ID
+                "guest_province_state = ?, guest_country = ?, status = ?, " +
+                "discount_amount = ? " +
+                "WHERE reservation_id = ?";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -332,22 +343,22 @@ public class BookingDao {
             pstmt.setString(2, session.getCheckInDate().format(DATE_FORMATTER));
             pstmt.setString(3, session.getCheckOutDate().format(DATE_FORMATTER));
             pstmt.setDouble(4, session.getTotalPrice());
-            pstmt.setString(5, session.getSelectedRoomsSummary());
-            pstmt.setString(6, session.getGuestFirstName());
-            pstmt.setString(7, session.getGuestLastName());
-            pstmt.setString(8, session.getGuestGender());
-            pstmt.setString(9, session.getGuestPhone());
-            pstmt.setString(10, session.getGuestEmail());
-            pstmt.setInt(11, session.getGuestAge());
-            pstmt.setString(12, session.getGuestStreet());
-            pstmt.setString(13, session.getGuestAptSuite());
-            pstmt.setString(14, session.getGuestCity());
-            pstmt.setString(15, session.getGuestProvinceState());
-            pstmt.setString(16, session.getGuestCountry());
-            pstmt.setString(17, session.getReservationId()); // WHERE clause parameter
+            pstmt.setString(5, session.getGuestFirstName());
+            pstmt.setString(6, session.getGuestLastName());
+            pstmt.setString(7, session.getGuestGender());
+            pstmt.setString(8, session.getGuestPhone());
+            pstmt.setString(9, session.getGuestEmail());
+            pstmt.setInt(10, session.getGuestAge());
+            pstmt.setString(11, session.getGuestStreet());
+            pstmt.setString(12, session.getGuestAptSuite());
+            pstmt.setString(13, session.getGuestCity());
+            pstmt.setString(14, session.getGuestProvinceState());
+            pstmt.setString(15, session.getGuestCountry());
+            pstmt.setString(16, session.getStatus() != null ? session.getStatus() : "Confirmed");
+            pstmt.setDouble(17, session.getDiscountAmount());
+            pstmt.setString(18, session.getReservationId());
 
             int rowsAffected = pstmt.executeUpdate();
-
             if (rowsAffected > 0) {
                 LOGGER.log(Level.INFO, "Booking with Reservation ID {0} updated successfully.", session.getReservationId());
                 return true;

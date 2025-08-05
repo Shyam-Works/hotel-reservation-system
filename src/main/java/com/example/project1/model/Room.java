@@ -1,43 +1,51 @@
 package com.example.project1.model;
 
 public class Room {
+    private int roomId; // Matches your 'roomId' column
+    private String roomNumber;
     private String roomType;
-    private String description;
-    private double pricePerNight;
-    private int maxAdults;
-    // Add other properties like roomNumber, available dates if needed for advanced logic
+    private double pricePerNight; // Matches your 'pricePerNight' column
+    private String status; // Internal status string (e.g., "Available", "Occupied")
 
-    public Room(String roomType, String description, double pricePerNight, int maxAdults) {
+    // Constructor for creating a new Room (without ID yet, default status)
+    public Room(String roomNumber, String roomType, double pricePerNight) {
+        this.roomNumber = roomNumber;
         this.roomType = roomType;
-        this.description = description;
         this.pricePerNight = pricePerNight;
-        this.maxAdults = maxAdults;
+        this.status = "Available"; // Default status
+    }
+
+    // Constructor for loading from DB (with all fields)
+    public Room(int roomId, String roomNumber, String roomType, double pricePerNight, String status) {
+        this.roomId = roomId;
+        this.roomNumber = roomNumber;
+        this.roomType = roomType;
+        this.pricePerNight = pricePerNight;
+        this.status = status;
     }
 
     // Getters
-    public String getRoomType() {
-        return roomType;
-    }
+    public int getRoomId() { return roomId; }
+    public String getRoomNumber() { return roomNumber; }
+    public String getRoomType() { return roomType; }
+    public double getPricePerNight() { return pricePerNight; }
+    public String getStatus() { return status; }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public double getPricePerNight() {
-        return pricePerNight;
-    }
-
-    public int getMaxAdults() {
-        return maxAdults;
-    }
+    // Setters
+    public void setRoomId(int roomId) { this.roomId = roomId; }
+    public void setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
+    public void setRoomType(String roomType) { this.roomType = roomType; }
+    public void setPricePerNight(double pricePerNight) { this.pricePerNight = pricePerNight; }
+    public void setStatus(String status) { this.status = status; }
 
     @Override
     public String toString() {
         return "Room{" +
-                "roomType='" + roomType + '\'' +
-                ", description='" + description + '\'' +
+                "roomId=" + roomId +
+                ", roomNumber='" + roomNumber + '\'' +
+                ", roomType='" + roomType + '\'' +
                 ", pricePerNight=" + pricePerNight +
-                ", maxAdults=" + maxAdults +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

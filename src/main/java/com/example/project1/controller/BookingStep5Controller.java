@@ -2,7 +2,7 @@ package com.example.project1.controller;
 
 import com.example.project1.model.BookingSession;
 import com.example.project1.util.AlertUtil;
-import com.example.project1.dao.BookingDao; // <--- NEW IMPORT for BookingDao
+import com.example.project1.dao.BookingDao;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,7 +32,6 @@ public class BookingStep5Controller {
     @FXML private Label totalLabel;
 
     private BookingSession bookingSession;
-
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     public void setBookingSession(BookingSession session) {
@@ -47,7 +46,6 @@ public class BookingStep5Controller {
             return;
         }
 
-        // --- All your existing label update logic (guest name, dates, rooms, etc.) ---
         String fullName = "";
         if (bookingSession.getGuestFirstName() != null) {
             fullName += bookingSession.getGuestFirstName();
@@ -57,7 +55,6 @@ public class BookingStep5Controller {
             fullName += bookingSession.getGuestLastName();
         }
         guestNameLabel.setText("Guest: " + (fullName.isEmpty() ? "N/A" : fullName));
-
 
         String datesText = "Check-in: N/A   Check-out: N/A";
         long nights = 0;
@@ -97,30 +94,31 @@ public class BookingStep5Controller {
 
     @FXML
     private void handleConfirmBooking(ActionEvent event) {
-        // Generate a simple reservation ID. In a real system, this would be more robust.
         String generatedReservationId = "ABC-" + System.currentTimeMillis() % 100000;
 
         if (bookingSession != null) {
-            bookingSession.setReservationId(generatedReservationId); // Store ID in the session
+            bookingSession.setReservationId(generatedReservationId);
 
-            // --- DATABASE SAVE OPERATION ---
-            BookingDao bookingDao = new BookingDao(); // Create an instance of your DAO
-            if (bookingDao.insertBooking(bookingSession)) { // Attempt to save the booking
+            BookingDao bookingDao = new BookingDao();
+
+            // --- FIX: The insertBooking method now returns an int, not a boolean. ---
+            int bookingId = bookingDao.insertBooking(bookingSession);
+
+            // We check if the returned ID is not -1, which indicates success.
+            if (bookingId != -1) {
                 LOGGER.log(Level.INFO, "Booking saved to database successfully with ID: {0}", generatedReservationId);
                 // If saving is successful, proceed to the next screen
             } else {
-                // If saving fails, show an error and stop navigation
                 AlertUtil.showErrorAlert("Database Error", "Failed to save booking to database. Please try again.");
                 LOGGER.log(Level.SEVERE, "Failed to save booking with ID: {0} to database.", generatedReservationId);
-                return; // Prevent navigation if DB save fails
+                return;
             }
         } else {
             AlertUtil.showErrorAlert("Booking Error", "Booking session is null. Cannot confirm booking.");
             LOGGER.log(Level.SEVERE, "Booking session is null during confirmation.");
-            return; // Stop if no session data
+            return;
         }
 
-        // --- NAVIGATION TO BOOKING STEP 6 ---
         try {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             URL fxmlLocation = getClass().getResource("/com/example/project1/BookingStep6.fxml");
@@ -133,7 +131,7 @@ public class BookingStep5Controller {
             Scene scene = new Scene(fxmlLoader.load());
 
             BookingStep6Controller nextController = fxmlLoader.getController();
-            nextController.setBookingSession(bookingSession); // Pass the session (now with reservation ID)
+            nextController.setBookingSession(bookingSession);
 
             stage.setScene(scene);
             stage.setTitle("Hotel ABC - Booking Successful!");

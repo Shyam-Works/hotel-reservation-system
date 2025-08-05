@@ -7,5 +7,5 @@ public class DatabaseConfig {
      * to a file named 'hotel_bookings.db' in your project's root directory
      * (or the directory from which your application is executed).
      */
-    public static final String DB_URL = "jdbc:sqlite:hotel_bookings.db";
+    public static final String DB_URL = "jdbc:sqlite:hotel_reservation.db";
 }

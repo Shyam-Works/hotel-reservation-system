@@ -3,99 +3,205 @@ package com.example.project1.model;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BookingSession {
+    private long id; // Add this field to store the actual DB ID of the booking
     private int numberOfGuests;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    private double totalPrice; // Calculated based on selected rooms and duration
-    private Map<String, Integer> selectedRoomsAndQuantities; // Map of roomType -> quantity
-
+    private double totalPrice;
+    private double discountAmount;
+    private Map<String, Integer> selectedRoomsAndQuantities;
     private String selectedRoomsSummary;
 
-    // Guest Details
+    // --- NEW FIELD: List of assigned rooms ---
+    private List<Room> assignedRooms;
+
     private String guestFirstName;
     private String guestLastName;
-    private String guestGender;
+    private String guestGender; // Corrected: This is the field that holds the gender string
     private String guestPhone;
     private String guestEmail;
     private int guestAge;
     private String guestStreet;
     private String guestAptSuite;
     private String guestCity;
-    private String guestProvinceState; // Ensure this matches usage in DAO
+    private String guestProvinceState;
     private String guestCountry;
+    private String reservationId;
     private String status;
-    // --- NEW FIELD: Reservation ID ---
-    private String reservationId; // This will store the unique ID generated at confirmation
 
     public BookingSession() {
         this.selectedRoomsAndQuantities = new HashMap<>();
         this.totalPrice = 0.0;
+        this.discountAmount = 0.0;
+        this.assignedRooms = new ArrayList<>(); // Initialize the list
     }
 
-    // --- All your existing Getters and Setters go here ---
-    // (Ensure you have getters and setters for all the fields above)
+    // --- GETTER/SETTER for id ---
+    public long getId() {
+        return id;
+    }
 
-    public int getNumberOfGuests() { return numberOfGuests; }
-    public void setNumberOfGuests(int numberOfGuests) { this.numberOfGuests = numberOfGuests; }
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    public LocalDate getCheckInDate() { return checkInDate; }
-    public void setCheckInDate(LocalDate checkInDate) { this.checkInDate = checkInDate; }
+    // --- GETTER/SETTER for assignedRooms ---
 
-    public LocalDate getCheckOutDate() { return checkOutDate; }
-    public void setCheckOutDate(LocalDate checkOutDate) { this.checkOutDate = checkOutDate; }
 
-    public Map<String, Integer> getSelectedRoomsAndQuantities() { return selectedRoomsAndQuantities; }
-    public void setSelectedRoomsAndQuantities(Map<String, Integer> selectedRoomsAndQuantities) { this.selectedRoomsAndQuantities = selectedRoomsAndQuantities; }
+    // Existing Getters and Setters:
 
-    public double getTotalPrice() { return totalPrice; }
-    public void setTotalPrice(double totalPrice) { this.totalPrice = totalPrice; }
+    public int getNumberOfGuests() {
+        return numberOfGuests;
+    }
 
-    public String getGuestFirstName() { return guestFirstName; }
-    public void setGuestFirstName(String guestFirstName) { this.guestFirstName = guestFirstName; }
+    public void setNumberOfGuests(int numberOfGuests) {
+        this.numberOfGuests = numberOfGuests;
+    }
 
-    public String getGuestLastName() { return guestLastName; }
-    public void setGuestLastName(String guestLastName) { this.guestLastName = guestLastName; }
+    public LocalDate getCheckInDate() {
+        return checkInDate;
+    }
 
-    public String getGuestGender() { return guestGender; }
-    public void setGuestGender(String guestGender) { this.guestGender = guestGender; }
+    public void setCheckInDate(LocalDate checkInDate) {
+        this.checkInDate = checkInDate;
+    }
 
-    public String getGuestPhone() { return guestPhone; }
-    public void setGuestPhone(String guestPhone) { this.guestPhone = guestPhone; }
+    public LocalDate getCheckOutDate() {
+        return checkOutDate;
+    }
 
-    public String getGuestEmail() { return guestEmail; }
-    public void setGuestEmail(String guestEmail) { this.guestEmail = guestEmail; }
+    public void setCheckOutDate(LocalDate checkOutDate) {
+        this.checkOutDate = checkOutDate;
+    }
 
-    public int getGuestAge() { return guestAge; }
-    public void setGuestAge(int guestAge) { this.guestAge = guestAge; }
+    public double getTotalPrice() {
+        return totalPrice;
+    }
 
-    public String getGuestStreet() { return guestStreet; }
-    public void setGuestStreet(String guestStreet) { this.guestStreet = guestStreet; }
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 
-    public String getGuestAptSuite() { return guestAptSuite; }
-    public void setGuestAptSuite(String guestAptSuite) { this.guestAptSuite = guestAptSuite; }
+    public double getDiscountAmount() {
+        return discountAmount;
+    }
 
-    public String getGuestCity() { return guestCity; }
-    public void setGuestCity(String guestCity) { this.guestCity = guestCity; }
+    public void setDiscountAmount(double discountAmount) {
+        this.discountAmount = discountAmount;
+    }
 
-    public String getGuestProvinceState() { return guestProvinceState; } // Ensure name matches field
-    public void setGuestProvinceState(String guestProvinceState) { this.guestProvinceState = guestProvinceState; }
+    public Map<String, Integer> getSelectedRoomsAndQuantities() {
+        return selectedRoomsAndQuantities;
+    }
 
-    public String getGuestCountry() { return guestCountry; }
-    public void setGuestCountry(String guestCountry) { this.guestCountry = guestCountry; }
-
+    public void setSelectedRoomsAndQuantities(Map<String, Integer> selectedRoomsAndQuantities) {
+        this.selectedRoomsAndQuantities = selectedRoomsAndQuantities;
+    }
 
     public String getSelectedRoomsSummary() {
         return selectedRoomsSummary;
     }
 
-    public void setSelectedRoomsSummary(String selectedRoomsSummary) { // <--- THIS IS THE MISSING METHOD
+    public void setSelectedRoomsSummary(String selectedRoomsSummary) {
         this.selectedRoomsSummary = selectedRoomsSummary;
     }
 
-    // --- NEW GETTER AND SETTER FOR RESERVATION ID ---
+    public String getGuestFirstName() {
+        return guestFirstName;
+    }
+
+    public void setGuestFirstName(String guestFirstName) {
+        this.guestFirstName = guestFirstName;
+    }
+
+    public String getGuestLastName() {
+        return guestLastName;
+    }
+
+    public void setGuestLastName(String guestLastName) {
+        this.guestLastName = guestLastName;
+    }
+
+    // --- CORRECTION MADE HERE ---
+    public String getGuestGender() {
+        return guestGender; // This now correctly returns the 'guestGender' field
+    }
+
+    public void setGuestGender(String guestGender) {
+        this.guestGender = guestGender;
+    }
+    // --- END CORRECTION ---
+
+    public String getGuestPhone() {
+        return guestPhone;
+    }
+
+    public void setGuestPhone(String guestPhone) {
+        this.guestPhone = guestPhone;
+    }
+
+    public String getGuestEmail() {
+        return guestEmail;
+    }
+
+    public void setGuestEmail(String guestEmail) {
+        this.guestEmail = guestEmail;
+    }
+
+    public int getGuestAge() {
+        return guestAge;
+    }
+
+    public void setGuestAge(int guestAge) {
+        this.guestAge = guestAge;
+    }
+
+    public String getGuestStreet() {
+        return guestStreet;
+    }
+
+    public void setGuestStreet(String guestStreet) {
+        this.guestStreet = guestStreet;
+    }
+
+    public String getGuestAptSuite() {
+        return guestAptSuite;
+    }
+
+    public void setGuestAptSuite(String guestAptSuite) {
+        this.guestAptSuite = guestAptSuite;
+    }
+
+    public String getGuestCity() {
+        return guestCity;
+    }
+
+    public void setGuestCity(String guestCity) {
+        this.guestCity = guestCity;
+    }
+
+    public String getGuestProvinceState() {
+        return guestProvinceState;
+    }
+
+    public void setGuestProvinceState(String guestProvinceState) {
+        this.guestProvinceState = guestProvinceState;
+    }
+
+    public String getGuestCountry() {
+        return guestCountry;
+    }
+
+    public void setGuestCountry(String guestCountry) {
+        this.guestCountry = guestCountry;
+    }
+
     public String getReservationId() {
         return reservationId;
     }
@@ -103,12 +209,26 @@ public class BookingSession {
     public void setReservationId(String reservationId) {
         this.reservationId = reservationId;
     }
+
     public String getStatus() {
         return status;
     }
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public List<Room> getAssignedRooms() {
+        return assignedRooms;
+    }
+
+    public void setAssignedRooms(List<Room> assignedRooms) {
+        this.assignedRooms = assignedRooms;
+        // You can also populate the old map for backward compatibility if needed
+        if (assignedRooms != null) {
+            Map<String, Integer> quantities = assignedRooms.stream()
+                    .collect(Collectors.groupingBy(Room::getRoomType, Collectors.reducing(0, e -> 1, Integer::sum)));
+            setSelectedRoomsAndQuantities(quantities);
+        }
     }
 
     @Override
@@ -118,14 +238,18 @@ public class BookingSession {
         String checkOutStr = (checkOutDate != null) ? checkOutDate.format(formatter) : "null";
 
         return "BookingSession{" +
-                "numberOfGuests=" + numberOfGuests +
+                "id=" + id +
+                ", numberOfGuests=" + numberOfGuests +
                 ", checkInDate='" + checkInStr + '\'' +
                 ", checkOutDate='" + checkOutStr + '\'' +
-                ", selectedRoomsAndQuantities=" + selectedRoomsAndQuantities +
                 ", totalPrice=" + totalPrice +
+                ", discountAmount=" + discountAmount +
+                ", selectedRoomsAndQuantities=" + selectedRoomsAndQuantities +
+                ", selectedRoomsSummary='" + selectedRoomsSummary + '\'' +
+                ", assignedRooms=" + assignedRooms +
                 ", guestFirstName='" + guestFirstName + '\'' +
                 ", guestLastName='" + guestLastName + '\'' +
-                ", guestGender='" + guestGender + '\'' +
+                ", guestGender='" + guestGender + '\'' + // Use guestGender field here
                 ", guestPhone='" + guestPhone + '\'' +
                 ", guestEmail='" + guestEmail + '\'' +
                 ", guestAge=" + guestAge +
@@ -134,7 +258,8 @@ public class BookingSession {
                 ", guestCity='" + guestCity + '\'' +
                 ", guestProvinceState='" + guestProvinceState + '\'' +
                 ", guestCountry='" + guestCountry + '\'' +
-                ", reservationId='" + reservationId + '\'' + // Include reservationId in toString
+                ", reservationId='" + reservationId + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

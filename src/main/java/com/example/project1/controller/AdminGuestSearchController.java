@@ -166,10 +166,44 @@ public class AdminGuestSearchController {
             AlertUtil.showWarningAlert("No Selection", "Please select a guest's booking to modify.");
             return;
         }
-        AlertUtil.showInformationAlert("Functionality",
-                "Modify Booking functionality for Reservation ID: " + selectedGuest.getReservationId() + " coming soon!");
-        LOGGER.log(Level.INFO, "Modify booking button clicked for Reservation ID: {0}", selectedGuest.getReservationId());
-        // In a real app, you'd navigate to a booking modification screen, passing the reservation ID.
+
+        // Fetch the full BookingSession object for the selected reservation
+        BookingSession bookingToModify = bookingDao.getBookingByReservationId(selectedGuest.getReservationId());
+
+        if (bookingToModify == null) {
+            AlertUtil.showErrorAlert("Error", "Could not retrieve full booking details for modification.");
+            LOGGER.log(Level.WARNING, "Failed to retrieve full booking details for modification for Reservation ID: {0}", selectedGuest.getReservationId());
+            return;
+        }
+
+        try {
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+
+            // Load the new AdminModifyBooking.fxml
+            URL fxmlLocation = getClass().getResource("/com/example/project1/AdminModifyBooking.fxml");
+            if (fxmlLocation == null) {
+                AlertUtil.showErrorAlert("Navigation Error", "AdminModifyBooking.fxml not found! Check the path.");
+                LOGGER.log(Level.SEVERE, "AdminModifyBooking.fxml not found for modification navigation.");
+                return;
+            }
+
+            FXMLLoader fxmlLoader = new FXMLLoader(fxmlLocation);
+            Scene scene = new Scene(fxmlLoader.load());
+
+            // Get the controller for the new page and pass the BookingSession
+            AdminModifyBookingController modifyController = fxmlLoader.getController();
+            modifyController.setBookingSession(bookingToModify); // Pass the full booking data
+
+            stage.setScene(scene);
+            stage.setTitle("Hotel ABC - Modify Booking");
+            stage.show();
+
+            LOGGER.log(Level.INFO, "Navigated to AdminModifyBooking for Reservation ID: {0}", selectedGuest.getReservationId());
+
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Could not load AdminModifyBooking page.", e);
+            AlertUtil.showErrorAlert("Navigation Error", "Could not load booking modification page: " + e.getMessage());
+        }
     }
 
     @FXML
@@ -195,4 +229,7 @@ public class AdminGuestSearchController {
             AlertUtil.showErrorAlert("Navigation Error", "Could not load Admin Dashboard page: " + e.getMessage());
         }
     }
+
+
+
 }
