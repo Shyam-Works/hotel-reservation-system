@@ -7,7 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.ChoiceBox; // Using ChoiceBox as per your FXML
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -26,7 +26,7 @@ public class KioskFeedbackController {
     @FXML
     private TextArea commentsArea;
     @FXML
-    private ChoiceBox<String> ratingChoiceBox; // Type is String as per your FXML
+    private ChoiceBox<String> ratingChoiceBox;
 
     private FeedbackDao feedbackDao;
 
@@ -41,17 +41,16 @@ public class KioskFeedbackController {
 
     @FXML
     private void handleSubmitFeedback(ActionEvent event) {
-        String phoneNumber = reservationIdField.getText().trim(); // Get phone number
-        String ratingString = ratingChoiceBox.getValue(); // Get selected rating as String
+        String phoneNumber = reservationIdField.getText().trim();
+        String ratingString = ratingChoiceBox.getValue();
         String comment = commentsArea.getText().trim();
 
         if (phoneNumber.isEmpty()) {
             AlertUtil.showErrorAlert("Input Error", "Phone Number is required.");
             return;
         }
-        // Basic phone number validation (can be enhanced)
-        if (!phoneNumber.matches("\\d+")) { // Only digits allowed for simplicity
-            AlertUtil.showErrorAlert("Input Error", "Please enter a valid phone number (digits only).");
+        if (!phoneNumber.matches("^\\+?[0-9\\s\\-()]{7,20}$")) { // More robust phone validation
+            AlertUtil.showErrorAlert("Input Error", "Please enter a valid phone number.");
             return;
         }
 
@@ -60,12 +59,12 @@ public class KioskFeedbackController {
             return;
         }
 
-        int rating = Integer.parseInt(ratingString); // Convert rating to int
+        int rating = Integer.parseInt(ratingString);
 
-        // Attempt to save feedback
+        // Attempt to save feedback using the FeedbackDao
         if (feedbackDao.insertFeedback(phoneNumber, rating, comment)) {
             AlertUtil.showInformationAlert("Feedback Submitted", "Thank you for your valuable feedback!");
-            navigateToWelcome(event); // Go back to welcome screen on success
+            navigateToWelcome(event);
         } else {
             AlertUtil.showErrorAlert("Database Error", "Failed to submit feedback. Please try again.");
             LOGGER.log(Level.SEVERE, "Failed to insert feedback for phone: {0}", phoneNumber);
@@ -74,12 +73,9 @@ public class KioskFeedbackController {
 
     @FXML
     private void handleBack(ActionEvent event) {
-        navigateToWelcome(event); // Go back to welcome screen
+        navigateToWelcome(event);
     }
 
-    /**
-     * Helper method to navigate back to the KioskWelcome.fxml.
-     */
     private void navigateToWelcome(ActionEvent event) {
         try {
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();

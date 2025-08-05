@@ -15,7 +15,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
@@ -114,6 +113,14 @@ public class AdminModifyBookingController {
 
         reservationIdLabel.setText("Reservation ID: " + currentBookingSession.getReservationId());
 
+        // --- CORRECTED: Use the new parsing logic and get the map ---
+        currentBookingSession.parseSummaryToQuantities();
+        Map<String, Integer> rooms = currentBookingSession.getSelectedRoomsAndQuantities();
+        singleRoomQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Single Room", 0));
+        doubleRoomQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Double Room", 0));
+        deluxeRoomQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Deluxe Room", 0));
+        penthouseQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Penthouse", 0));
+
         firstNameField.setText(currentBookingSession.getGuestFirstName());
         lastNameField.setText(currentBookingSession.getGuestLastName());
         genderComboBox.setValue(currentBookingSession.getGuestGender());
@@ -130,13 +137,6 @@ public class AdminModifyBookingController {
         checkOutDatePicker.setValue(currentBookingSession.getCheckOutDate());
         numGuestsSpinner.getValueFactory().setValue(currentBookingSession.getNumberOfGuests());
         statusComboBox.setValue(currentBookingSession.getStatus());
-
-        // --- CORRECTED: Populate Room Quantities from the Map using your room types ---
-        Map<String, Integer> rooms = currentBookingSession.getSelectedRoomsAndQuantities();
-        singleRoomQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Single Room", 0));
-        doubleRoomQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Double Room", 0));
-        deluxeRoomQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Deluxe Room", 0));
-        penthouseQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Penthouse", 0));
 
         discountSpinner.getValueFactory().setValue(currentBookingSession.getDiscountAmount());
 
@@ -206,7 +206,6 @@ public class AdminModifyBookingController {
             currentBookingSession.setNumberOfGuests(numGuestsSpinner.getValue());
             currentBookingSession.setStatus(statusComboBox.getValue());
 
-            // --- CORRECTED: Update selected rooms and quantities map using your room types ---
             Map<String, Integer> updatedRooms = new HashMap<>();
             if (singleRoomQuantitySpinner.getValue() > 0) updatedRooms.put("Single Room", singleRoomQuantitySpinner.getValue());
             if (doubleRoomQuantitySpinner.getValue() > 0) updatedRooms.put("Double Room", doubleRoomQuantitySpinner.getValue());
@@ -214,10 +213,10 @@ public class AdminModifyBookingController {
             if (penthouseQuantitySpinner.getValue() > 0) updatedRooms.put("Penthouse", penthouseQuantitySpinner.getValue());
             currentBookingSession.setSelectedRoomsAndQuantities(updatedRooms);
 
-            // Generate a new summary string from the updated map for database storage
+            // --- CORRECTED: Generate the summary in the consistent format: 1x Single Room ---
             String summary = updatedRooms.entrySet().stream()
-                    .map(entry -> entry.getKey() + " x " + entry.getValue())
-                    .collect(Collectors.joining("; "));
+                    .map(entry -> entry.getValue() + "x " + entry.getKey())
+                    .collect(Collectors.joining(", "));
             currentBookingSession.setSelectedRoomsSummary(summary);
 
             currentBookingSession.setDiscountAmount(discountSpinner.getValue());
@@ -299,6 +298,7 @@ public class AdminModifyBookingController {
             return false;
         }
     }
+
 
     @FXML
     private void handleBack(ActionEvent event) {

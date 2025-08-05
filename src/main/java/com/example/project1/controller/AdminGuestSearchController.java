@@ -68,7 +68,7 @@ public class AdminGuestSearchController {
     }
 
     private void loadSearchResults(String searchTerm) {
-        List<GuestSearchResult> results = bookingDao.searchBookings(searchTerm);
+        List<GuestSearchResult> results = bookingDao.searchGuestsByLastName(searchTerm);
         ObservableList<GuestSearchResult> observableResults = FXCollections.observableArrayList(results);
         resultsTable.setItems(observableResults);
 

@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
@@ -59,12 +60,6 @@ public class KioskWelcomeController {
         }
     }
 
-    @FXML
-    private void handleShowRules(ActionEvent event) {
-        LOGGER.log(Level.INFO, "Displaying Rules & Regulations...");
-        showAlert("Rules & Regulations", "Placeholder for Rules & Regulations content.");
-        // TODO: Implement logic to open a new window or scene for Rules & Regulations
-    }
 
     @FXML
     private void handleLeaveFeedback(ActionEvent event) {
@@ -115,6 +110,32 @@ public class KioskWelcomeController {
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    @FXML
+    private void handleShowRules(ActionEvent event) {
+        LOGGER.log(Level.INFO, "Displaying Rules & Regulations...");
+        String rulesText = "• Single room: Max two people.\n\n" +
+                "• Double room: Max 4 people.\n\n" +
+                "• Deluxe and Pent rooms: Max two people but the prices are higher.\n\n" +
+                "• More than 2 adults less than 5 can have Double room or two single rooms will be offered.\n\n" +
+                "• More than 4 adults will have multiple Double or combination of Double and single rooms.";
+
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("Rules and Regulations");
+        alert.setHeaderText("Hotel Room Booking Rules");
+
+        TextArea textArea = new TextArea(rulesText);
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setPrefHeight(200);
+        textArea.setPrefWidth(400);
+
+        alert.getDialogPane().setContent(textArea);
+        alert.getDialogPane().setPrefWidth(500);
+        alert.setResizable(true);
+
         alert.showAndWait();
     }
 }

@@ -6,9 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 public class BookingSession {
+    private static final Logger LOGGER = Logger.getLogger(BookingSession.class.getName());
     private long id; // Add this field to store the actual DB ID of the booking
     private int numberOfGuests;
     private LocalDate checkInDate;
@@ -228,6 +232,32 @@ public class BookingSession {
             Map<String, Integer> quantities = assignedRooms.stream()
                     .collect(Collectors.groupingBy(Room::getRoomType, Collectors.reducing(0, e -> 1, Integer::sum)));
             setSelectedRoomsAndQuantities(quantities);
+        }
+    }
+
+    public void parseSummaryToQuantities() {
+        this.selectedRoomsAndQuantities = new HashMap<>();
+        if (this.selectedRoomsSummary == null || this.selectedRoomsSummary.trim().isEmpty()) {
+            LOGGER.log(Level.WARNING, "Selected rooms summary is null or empty. Not parsing.");
+            return;
+        }
+
+        LOGGER.log(Level.INFO, "Parsing room summary: " + this.selectedRoomsSummary);
+
+        String[] rooms = this.selectedRoomsSummary.split(", ");
+        for (String room : rooms) {
+            String[] parts = room.split("x ");
+            if (parts.length == 2) {
+                try {
+                    int quantity = Integer.parseInt(parts[0].trim());
+                    String roomType = parts[1].trim();
+                    this.selectedRoomsAndQuantities.put(roomType, quantity);
+                } catch (NumberFormatException e) {
+                    LOGGER.log(Level.SEVERE, "Error parsing room summary part: " + room, e);
+                }
+            } else {
+                LOGGER.log(Level.WARNING, "Unexpected format for room summary part: " + room);
+            }
         }
     }
 
