@@ -21,7 +21,8 @@ public class BookingSession {
     private double discountAmount;
     private Map<String, Integer> selectedRoomsAndQuantities;
     private String selectedRoomsSummary;
-
+    private double discountPercentage;
+    private double finalPrice;
     // --- NEW FIELD: List of assigned rooms ---
     private List<Room> assignedRooms;
 
@@ -219,12 +220,17 @@ public class BookingSession {
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        this.status = "Confirmed";
     }
     public List<Room> getAssignedRooms() {
         return assignedRooms;
     }
-
+    public double getDiscountPercentage() {
+        return discountPercentage;
+    }
+    public void setDiscountPercentage(double discountPercentage) {
+        this.discountPercentage = discountPercentage;
+    }
     public void setAssignedRooms(List<Room> assignedRooms) {
         this.assignedRooms = assignedRooms;
         // You can also populate the old map for backward compatibility if needed
@@ -233,6 +239,13 @@ public class BookingSession {
                     .collect(Collectors.groupingBy(Room::getRoomType, Collectors.reducing(0, e -> 1, Integer::sum)));
             setSelectedRoomsAndQuantities(quantities);
         }
+    }
+    public double getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(double finalPrice) {
+        this.finalPrice = finalPrice;
     }
 
     public void parseSummaryToQuantities() {

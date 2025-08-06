@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,6 +43,9 @@ public class AdminReportsController {
 
     private static final double TAX_RATE = 0.13; // Example tax rate (13%)
     private static final DecimalFormat CURRENCY_FORMATTER = new DecimalFormat("$#,##0.00");
+
+    // Room Pricing constants are no longer needed for the report since we are fetching
+    // the pre-calculated room charge from the database.
 
     @FXML
     public void initialize() {
@@ -91,33 +95,29 @@ public class AdminReportsController {
         checkOutLabel.setText(currentBookingSession.getCheckOutDate().toString());
         billDateLabel.setText(LocalDate.now().toString());
 
-        // --- Corrected Financials Calculation ---
-        // Assuming totalPrice in the database is the final amount after discount and tax.
-        // Assuming discountAmount is the value of the discount.
-
-        double finalTotal = currentBookingSession.getTotalPrice();
-        double discount = currentBookingSession.getDiscountAmount();
-
-        // Calculate the amount before discount, but after taxes
-        double preDiscountTotal = finalTotal + discount;
-
-        // Calculate the base room charges (pre-tax)
-        double roomCharges = preDiscountTotal;
-
-        // Calculate the taxes based on the room charges
+        // --- Financials Calculation - now fetched from the database ---
+        // `getTotalPrice` now returns the price before tax and discount
+        double roomCharges = currentBookingSession.getTotalPrice();
         double taxes = roomCharges * TAX_RATE;
-
-        // The subtotal is the total of all charges before discounts
         double subtotal = roomCharges + taxes;
 
-        // The final total is the subtotal minus the discount
-        double totalAmount = subtotal - discount;
+        // Fetch the discount and final price stored in the database
+        double discountPercentage = currentBookingSession.getDiscountPercentage();
+        double finalPrice = currentBookingSession.getFinalPrice();
 
+        // Calculate the discount amount based on the subtotal and the stored percentage
+        double discountAmount = subtotal * (discountPercentage / 100.0);
+
+        // --- Populating Financial Labels ---
         roomChargesLabel.setText(CURRENCY_FORMATTER.format(roomCharges));
         taxesLabel.setText(CURRENCY_FORMATTER.format(taxes));
         subtotalLabel.setText(CURRENCY_FORMATTER.format(subtotal));
-        discountLabel.setText("-" + CURRENCY_FORMATTER.format(discount));
-        totalAmountLabel.setText(CURRENCY_FORMATTER.format(totalAmount));
+
+        // Display both percentage and amount
+        discountLabel.setText(String.format("%.1f%% (-%s)", discountPercentage, CURRENCY_FORMATTER.format(discountAmount)));
+
+        // Display the final price fetched from the database
+        totalAmountLabel.setText(CURRENCY_FORMATTER.format(finalPrice));
     }
 
     private void clearReport() {

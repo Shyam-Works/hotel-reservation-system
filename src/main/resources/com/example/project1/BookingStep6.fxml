@@ -3,36 +3,51 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="429.0" prefWidth="800.0" style="-fx-background-color: #F0F4F8;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.example.project1.controller.BookingStep6Controller"> <children>
-   <VBox alignment="CENTER" prefHeight="446.0" prefWidth="800.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-      <children>
-         <Label text="Booking Successful!" textFill="#10B981">
-            <font>
-               <Font name="System Bold" size="42.0" />
-            </font>
-         </Label>
-         <Label text="Your reservation is confirmed.">
-            <font><Font size="18.0" /></font>
-         </Label>
-         <Label fx:id="reservationIdLabel" text="Reservation ID: #1045">
-            <font><Font name="System Bold" size="18.0" /></font>
-         </Label>
-         <Label text="Welcome to Hotel ABC! We look forward to your stay." textAlignment="CENTER" wrapText="true">
-            <font><Font size="16.0" /></font>
-         </Label>
-         <Label style="-fx-padding: 10;" text="Reminder: After your stay, you can use this kiosk to leave feedback about your experience." textAlignment="CENTER" wrapText="true">
-            <font><Font size="14.0" /></font>
-         </Label>
-         <Button fx:id="finishButton" onAction="#handleFinish" prefHeight="40.0" prefWidth="150.0" style="-fx-text-fill: black;" text="Finish" />
-      </children>
-      <padding>
-         <Insets bottom="20.0" left="50.0" right="50.0" top="20.0" />
-      </padding>
-   </VBox>
-</children>
+<AnchorPane prefHeight="429.0" prefWidth="800.0" style="-fx-background-color: #F0F4F8;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project1.controller.BookingStep6Controller">
+   <children>
+      <VBox alignment="CENTER" prefHeight="446.0" prefWidth="800.0" spacing="15.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 10; -fx-padding: 30;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="20.0">
+         <children>
+            <Label text="Booking Successful!" textFill="#10B981">
+               <font>
+                  <Font name="System Bold" size="42.0" />
+               </font>
+            </Label>
+            <Label text="Your reservation is confirmed.">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label fx:id="reservationIdLabel" text="Reservation ID: #1045">
+               <font>
+                  <Font name="System Bold" size="18.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Label>
+            <Label text="Welcome to Hotel ABC! We look forward to your stay." textAlignment="CENTER" textFill="#4B5563" wrapText="true">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label text="Reminder: After your stay, you can use this kiosk to leave your feedback." textAlignment="CENTER" textFill="#6B7280" wrapText="true">
+               <font>
+                  <Font size="14.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <Button fx:id="finishButton" onAction="#handleFinish" prefHeight="40.0" prefWidth="150.0" style="-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="Finish" />
+         </children>
+         <effect>
+            <DropShadow blurType="GAUSSIAN" color="#00000020" height="10.0" radius="4.5" width="10.0" />
+         </effect>
+      </VBox>
+   </children>
 </AnchorPane>

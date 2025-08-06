@@ -52,7 +52,7 @@ public class AdminModifyBookingController {
     @FXML private DatePicker checkOutDatePicker;
     @FXML private Spinner<Integer> numGuestsSpinner;
 
-    // --- Room Spinners (Corrected for your four room types) ---
+    // --- Room Spinners ---
     @FXML private Spinner<Integer> singleRoomQuantitySpinner;
     @FXML private Spinner<Integer> doubleRoomQuantitySpinner;
     @FXML private Spinner<Integer> deluxeRoomQuantitySpinner;
@@ -61,7 +61,6 @@ public class AdminModifyBookingController {
     @FXML private Spinner<Double> discountSpinner;
     @FXML private ComboBox<String> statusComboBox;
     @FXML private Label totalPriceLabel;
-    @FXML private Label assignedRoomNumbersLabel;
 
     // --- Constructor ---
     public AdminModifyBookingController() {
@@ -79,7 +78,8 @@ public class AdminModifyBookingController {
         deluxeRoomQuantitySpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10, 0));
         penthouseQuantitySpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10, 0));
 
-        SpinnerValueFactory<Double> discountValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 10000.0, 0.0, 5.0);
+        // Set the discount spinner to work with percentages (0 to 100)
+        SpinnerValueFactory<Double> discountValueFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 100.0, 0.0, 1.0);
         discountSpinner.setValueFactory(discountValueFactory);
         discountSpinner.setEditable(true);
 
@@ -113,7 +113,6 @@ public class AdminModifyBookingController {
 
         reservationIdLabel.setText("Reservation ID: " + currentBookingSession.getReservationId());
 
-        // --- CORRECTED: Use the new parsing logic and get the map ---
         currentBookingSession.parseSummaryToQuantities();
         Map<String, Integer> rooms = currentBookingSession.getSelectedRoomsAndQuantities();
         singleRoomQuantitySpinner.getValueFactory().setValue(rooms.getOrDefault("Single Room", 0));
@@ -138,12 +137,8 @@ public class AdminModifyBookingController {
         numGuestsSpinner.getValueFactory().setValue(currentBookingSession.getNumberOfGuests());
         statusComboBox.setValue(currentBookingSession.getStatus());
 
-        discountSpinner.getValueFactory().setValue(currentBookingSession.getDiscountAmount());
-
-        String assignedRoomsString = currentBookingSession.getAssignedRooms().stream()
-                .map(room -> room.getRoomNumber())
-                .collect(Collectors.joining(", "));
-        assignedRoomNumbersLabel.setText(assignedRoomsString.isEmpty() ? "No rooms assigned." : assignedRoomsString);
+        // Populate the discount spinner with the percentage from the booking session
+        discountSpinner.getValueFactory().setValue(currentBookingSession.getDiscountPercentage());
     }
 
     private void calculateAndUpdatePrice() {
@@ -163,12 +158,14 @@ public class AdminModifyBookingController {
 
         double calculatedTotalPrice = baseRoomPrice * numberOfNights;
 
-        double discount = discountSpinner.getValue();
-        if (discount < 0) {
-            discount = 0;
+        // Calculate discount based on percentage
+        double discountPercentage = discountSpinner.getValue();
+        if (discountPercentage < 0 || discountPercentage > 100) {
+            discountPercentage = 0;
             discountSpinner.getValueFactory().setValue(0.0);
         }
-        calculatedTotalPrice -= discount;
+        double discountAmount = calculatedTotalPrice * (discountPercentage / 100.0);
+        calculatedTotalPrice -= discountAmount;
 
         if (calculatedTotalPrice < 0) {
             calculatedTotalPrice = 0;
@@ -213,13 +210,14 @@ public class AdminModifyBookingController {
             if (penthouseQuantitySpinner.getValue() > 0) updatedRooms.put("Penthouse", penthouseQuantitySpinner.getValue());
             currentBookingSession.setSelectedRoomsAndQuantities(updatedRooms);
 
-            // --- CORRECTED: Generate the summary in the consistent format: 1x Single Room ---
+            // Generate the summary in the consistent format
             String summary = updatedRooms.entrySet().stream()
                     .map(entry -> entry.getValue() + "x " + entry.getKey())
                     .collect(Collectors.joining(", "));
             currentBookingSession.setSelectedRoomsSummary(summary);
 
-            currentBookingSession.setDiscountAmount(discountSpinner.getValue());
+            // Set the new discount percentage
+            currentBookingSession.setDiscountPercentage(discountSpinner.getValue());
 
             calculateAndUpdatePrice();
             double newTotalPrice = Double.parseDouble(totalPriceLabel.getText().replace("$", "").replace(",", ""));
@@ -287,8 +285,9 @@ public class AdminModifyBookingController {
             errorMessage += "Please select at least one room.\n";
         }
 
-        if (discountSpinner.getValue() == null || discountSpinner.getValue() < 0) {
-            errorMessage += "Discount amount cannot be negative.\n";
+        double discount = discountSpinner.getValue();
+        if (discount < 0 || discount > 100) {
+            errorMessage += "Discount percentage must be between 0 and 100.\n";
         }
 
         if (errorMessage.isEmpty()) {

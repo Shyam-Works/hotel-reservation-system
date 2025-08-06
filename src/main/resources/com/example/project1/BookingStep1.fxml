@@ -5,39 +5,44 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project1.controller.BookingStep1Controller">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #F0F4F8;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project1.controller.BookingStep1Controller">
     <children>
-        <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-padding: 40; -fx-background-radius: 10;" AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="100.0" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="40.0">
             <children>
                 <Label text="Number of Guests" textFill="#1E3A8A">
                     <font>
                         <Font name="System Bold" size="36.0" />
                     </font>
                 </Label>
-                <Label text="How many guests will be staying?" textFill="#4B5563">
+                <Label text="How many adults will be staying?" textFill="#4B5563">
                     <font>
                         <Font size="18.0" />
                     </font>
                 </Label>
-                <TextField fx:id="numberOfGuestsField" alignment="CENTER" maxWidth="200.0" promptText="e.g., 2">
-                    <font>
-                        <Font size="14.0" />
-                    </font>
+                <TextField fx:id="numberOfGuestsField" alignment="CENTER" maxWidth="200.0" promptText="e.g., 2" style="-fx-background-radius: 5; -fx-border-color: #DDDDDD; -fx-border-width: 1; -fx-font-size: 16;">
                     <VBox.margin>
                         <Insets top="20.0" />
                     </VBox.margin>
                 </TextField>
-                <Label text="Please enter a valid number." textFill="#EF4444" visible="false" />
-                <AnchorPane VBox.vgrow="ALWAYS">
+                <Label text="Please enter a valid number." textFill="#EF4444" visible="false">
+                    <font>
+                        <Font size="12.0" />
+                    </font>
+                </Label>
+                <Region VBox.vgrow="ALWAYS" />
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
-                        <Button fx:id="backButton" onAction="#handleBack" style="-fx-text-fill: black; -fx-padding: 8 15; -fx-background-radius: 5;" text="Back" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
-                        <Button fx:id="nextButton" onAction="#handleNextStep" style="-fx-text-fill: black; -fx-padding: 8 15; -fx-background-radius: 5;" text="Next" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                        <Button fx:id="backButton" onAction="#handleBack" prefWidth="100.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="Back" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="nextButton" onAction="#handleNextStep" prefWidth="100.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="Next" />
                     </children>
-                </AnchorPane>
+                </HBox>
             </children>
             <padding>
                 <Insets bottom="20.0" left="20.0" right="20.0" top="30.0" />

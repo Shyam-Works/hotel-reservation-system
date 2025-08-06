@@ -14,10 +14,10 @@
 <?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 <?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="800.0" prefWidth="700.0" style="-fx-background-color: #F4F4F4;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://www.w3.org/2001/XMLSchema-instance" fx:controller="com.example.project1.controller.AdminReportsController">
+<BorderPane prefHeight="800.0" prefWidth="700.0" style="-fx-background-color: #F4F4F4;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project1.controller.AdminReportsController">
    <top>
       <VBox alignment="CENTER" spacing="15.0" BorderPane.alignment="CENTER">
          <padding>
@@ -157,7 +157,7 @@
                         <Font name="System Bold" size="14.0" />
                      </font>
                   </Label>
-                  <Label text="Discount:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                  <Label text="Discount (%):" GridPane.columnIndex="0" GridPane.rowIndex="3">
                      <font>
                         <Font size="14.0" />
                      </font>

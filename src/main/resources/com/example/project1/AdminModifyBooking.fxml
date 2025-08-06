@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
@@ -152,29 +151,6 @@
 
                 <Separator prefWidth="200.0" />
 
-                <Label text="Assigned Room Information" textFill="#1E3A8A">
-                    <font>
-                        <Font name="System Bold" size="18.0" />
-                    </font>
-                </Label>
-                <GridPane hgap="10" vgap="8" maxWidth="700.0">
-                    <padding>
-                        <Insets bottom="10" left="10" right="10" top="5" />
-                    </padding>
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="150.0" minWidth="10.0" prefWidth="120.0" />
-                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="500.0" minWidth="10.0" prefWidth="550.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                    <children>
-                        <Label text="Assigned Rooms:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                        <Label fx:id="assignedRoomNumbersLabel" text="[No rooms assigned.]" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    </children>
-                </GridPane>
-                <Separator prefWidth="200.0" />
-
                 <Label text="Pricing &amp; Discount" textFill="#1E3A8A">
                     <font>
                         <Font name="System Bold" size="18.0" />
@@ -192,7 +168,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                     <children>
-                        <Label text="Applied Discount:" />
+                        <Label text="Applied Discount (%):" />
                         <Spinner fx:id="discountSpinner" editable="true" GridPane.columnIndex="1" />
                         <Label text="Current Status:" GridPane.columnIndex="2" />
                         <ComboBox fx:id="statusComboBox" promptText="Select Status" GridPane.columnIndex="3" />

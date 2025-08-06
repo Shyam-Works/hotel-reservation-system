@@ -1,7 +1,7 @@
 package com.example.project1.controller;
 
-import com.example.project1.model.BookingSession; // To receive booking data
-import com.example.project1.util.AlertUtil; // For alerts
+import com.example.project1.model.BookingSession;
+import com.example.project1.util.AlertUtil;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -37,11 +37,10 @@ public class GuestDetailsController {
     @FXML private Label checkInDateLabel;
     @FXML private Label checkOutDateLabel;
     @FXML private Label numGuestsLabel;
-    @FXML private Label statusLabel; // Assuming a status for the booking
+    @FXML private Label statusLabel;
 
-    // Room Information Labels
-    @FXML private Label roomNumberLabel; // Note: Your current booking flow doesn't assign specific room numbers
-    @FXML private Label roomTypeLabel;   // This will display the selected_rooms_summary
+    // Room Information Label
+    @FXML private Label roomTypeLabel;
 
     private BookingSession currentBookingSession;
 
@@ -79,18 +78,21 @@ public class GuestDetailsController {
 
         // Reservation Information
         reservationIdLabel.setText(currentBookingSession.getReservationId());
-        // Ensure check-in/out dates are formatted nicely if needed, otherwise direct toString()
         checkInDateLabel.setText(currentBookingSession.getCheckInDate() != null ? currentBookingSession.getCheckInDate().toString() : "N/A");
         checkOutDateLabel.setText(currentBookingSession.getCheckOutDate() != null ? currentBookingSession.getCheckOutDate().toString() : "N/A");
         numGuestsLabel.setText(String.valueOf(currentBookingSession.getNumberOfGuests()));
-        // Assuming status is "Confirmed" for now, or if you add to DB, retrieve it.
         statusLabel.setText(currentBookingSession.getStatus());
 
         // Room Information
-        // Note: Your current booking system does not assign specific room numbers.
-        // This label will remain empty or display a placeholder unless you implement room assignment.
-        roomNumberLabel.setText("N/A (Not assigned)"); // Placeholder
-        roomTypeLabel.setText(currentBookingSession.getSelectedRoomsSummary()); // Displays e.g., "Deluxe (x1), Standard (x2)"
+        // Check if room data exists before setting the label text
+        String roomSummary = currentBookingSession.getSelectedRoomsSummary();
+        if (roomSummary != null && !roomSummary.trim().isEmpty()) {
+            roomTypeLabel.setText(roomSummary);
+        } else {
+            // Set a clear placeholder if no data is found
+            roomTypeLabel.setText("N/A - No room type assigned");
+            LOGGER.log(Level.WARNING, "Room type summary was not available for Reservation ID: {0}", currentBookingSession.getReservationId());
+        }
     }
 
     @FXML
@@ -103,18 +105,11 @@ public class GuestDetailsController {
                 LOGGER.log(Level.SEVERE, "AdminGuestSearch.fxml not found for back navigation from Guest Details.");
                 return;
             }
-
             FXMLLoader fxmlLoader = new FXMLLoader(fxmlLocation);
             Scene scene = new Scene(fxmlLoader.load());
-
-            // No data to pass back to the search page for now, as it reloads its own state
-            // AdminGuestSearchController searchController = fxmlLoader.getController();
-            // If you want to retain search results, you'd pass them back.
-
             stage.setScene(scene);
             stage.setTitle("Hotel ABC - Guest Search");
             stage.show();
-
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Could not load Guest Search page from Guest Details.", e);
             AlertUtil.showErrorAlert("Navigation Error", "Could not load Guest Search page: " + e.getMessage());

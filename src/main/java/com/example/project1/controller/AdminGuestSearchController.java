@@ -157,7 +157,7 @@ public class AdminGuestSearchController {
             // Refresh the table to show the updated list (booking should now be gone)
             loadSearchResults(searchField.getText().trim());
         }
-        }
+    }
 
     @FXML
     private void handleModifyBooking(ActionEvent event) {

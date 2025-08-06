@@ -93,21 +93,35 @@ public class BookingStep5Controller {
 
 
     @FXML
+    // Inside your BookingStep5Controller.java
+
     private void handleConfirmBooking(ActionEvent event) {
         String generatedReservationId = "ABC-" + System.currentTimeMillis() % 100000;
 
         if (bookingSession != null) {
             bookingSession.setReservationId(generatedReservationId);
 
+            // --- Step 1: Perform the final price calculation ---
+            double TAX_RATE = 0.13; // Make sure this is defined as a constant in your class
+            double totalPrice = bookingSession.getTotalPrice();
+            double taxes = totalPrice * TAX_RATE;
+            double subtotal = totalPrice + taxes;
+
+            // Calculate discount amount from the percentage
+            double discountPercentage = bookingSession.getDiscountPercentage();
+            double discountAmount = subtotal * (discountPercentage / 100.0);
+
+            // Calculate and set the final price in the session object
+            double finalPrice = subtotal - discountAmount;
+            bookingSession.setFinalPrice(finalPrice);
+
             BookingDao bookingDao = new BookingDao();
 
-            // --- FIX: The insertBooking method now returns an int, not a boolean. ---
+            // --- Step 2: Insert the booking with the newly calculated final price ---
             int bookingId = bookingDao.insertBooking(bookingSession);
 
-            // We check if the returned ID is not -1, which indicates success.
             if (bookingId != -1) {
                 LOGGER.log(Level.INFO, "Booking saved to database successfully with ID: {0}", generatedReservationId);
-                // If saving is successful, proceed to the next screen
             } else {
                 AlertUtil.showErrorAlert("Database Error", "Failed to save booking to database. Please try again.");
                 LOGGER.log(Level.SEVERE, "Failed to save booking with ID: {0} to database.", generatedReservationId);

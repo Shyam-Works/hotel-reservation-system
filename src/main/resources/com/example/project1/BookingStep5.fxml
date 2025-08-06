@@ -4,59 +4,99 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project1.controller.BookingStep5Controller">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #F0F4F8;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.project1.controller.BookingStep5Controller">
    <children>
-      <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="800.0" spacing="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox alignment="CENTER" prefHeight="600.0" prefWidth="800.0" spacing="20.0" style="-fx-background-color: #FFFFFF; -fx-background-radius: 10; -fx-padding: 30;" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
          <children>
             <Label text="Confirm Your Reservation" textFill="#1E3A8A">
                <font>
                   <Font name="System Bold" size="36.0" />
                </font>
             </Label>
-            <VBox maxWidth="692.0" prefHeight="312.0" prefWidth="692.0" spacing="10.0" style="-fx-border-color: #D1D5DB; -fx-border-radius: 8; -fx-padding: 20;">
+            <VBox alignment="CENTER_LEFT" maxWidth="600.0" prefHeight="312.0" prefWidth="692.0" spacing="10.0" style="-fx-border-color: #D1D5DB; -fx-border-radius: 8; -fx-padding: 20;">
                <children>
+                  <Label text="Reservation Summary" textFill="#4B5563">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+                  <Separator prefWidth="200.0" />
                   <Label fx:id="guestNameLabel" text="Guest: John Doe">
-                     <font><Font size="16.0" /></font>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
                   </Label>
                   <Label fx:id="datesLabel" text="Check-in: 2025-07-20   Check-out: 2025-07-22 (2 Nights)">
-                     <font><Font size="16.0" /></font>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
                   </Label>
                   <Label fx:id="roomTypeLabel" text="Room Type: Single Room(1), Deluxe Rooms(2)">
-                     <font><Font size="16.0" /></font>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
                   </Label>
                   <Label fx:id="numberOfGuestsLabel" text="Number of Guests: 2">
-                     <font><Font size="16.0" /></font>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
                   </Label>
-                  <Separator prefHeight="67.0" prefWidth="650.0" />
+                  <Separator prefWidth="200.0">
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Separator>
                   <Label fx:id="priceLabel" text="Room Price (2 nights):   $300.00">
-                     <font><Font size="16.0" /></font>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
                   </Label>
                   <Label fx:id="taxLabel" text="Taxes:                             $  39.00">
-                     <font><Font size="16.0" /></font>
+                     <font>
+                        <Font size="16.0" />
+                     </font>
                   </Label>
-                   <Separator prefWidth="200.0" />
-                  <Label fx:id="totalLabel" text="Estimated Total:         $339.00">
-                     <font><Font name="System Bold" size="18.0" /></font>
+                  <Separator prefWidth="200.0">
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Separator>
+                  <Label fx:id="totalLabel" text="Estimated Total:         $339.00" textFill="#1E3A8A">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
                   </Label>
                </children>
+               <effect>
+                  <DropShadow blurType="GAUSSIAN" color="#00000020" height="10.0" radius="4.5" width="10.0" />
+               </effect>
             </VBox>
-            <Label text="Please see the front desk for payment upon check-out." textFill="#4B5563" wrapText="true">
-               <font><Font size="14.0" /></font>
+            <Label text="Please see the front desk for payment upon check-in.">
+               <font>
+                  <Font size="14.0" />
+               </font>
             </Label>
-            <AnchorPane VBox.vgrow="ALWAYS">
+            <Region VBox.vgrow="ALWAYS" />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
                <children>
-                  <Button fx:id="backButton" onAction="#handleBack" text="Back" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" />
-                  <Button fx:id="confirmButton" onAction="#handleConfirmBooking" style="-fx-text-fill: black;" text="Confirm &amp; Book" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />
+                  <Button fx:id="backButton" onAction="#handleBack" prefWidth="150.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="Back" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="confirmButton" onAction="#handleConfirmBooking" prefWidth="150.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8;" text="Confirm &amp; Book" />
                </children>
-            </AnchorPane>
+            </HBox>
          </children>
-         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="50.0" />
-         </padding>
       </VBox>
    </children>
 </AnchorPane>

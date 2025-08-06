@@ -33,7 +33,7 @@ public class KioskWelcomeController {
 
     @FXML
     public void initialize() {
-        videoPlaceholderLabel.setVisible(true);
+//        videoPlaceholderLabel.setVisible(true);
     }
 
     @FXML
